@@ -16,18 +16,24 @@ int freplace(char* file_name, int replace_line);
 int finsert(char* file_name, int replace_line);
 int fmerge(char*file_name, char* file2_name, char* mergefile_name);
 int fencrypt(char*file_name, char *encryptfile_name);
+int fdecrypt(char*decrypt_file, char* outfile);
 
 int main()
 {
 	char file_name[20];
-	char encrypt_name[20];
-	printf("Input source file: ");
+	char encrypt_file[20];
+	char decrypt_file[20];
+	printf("Enter file name: ");
 	scanf("%s", file_name);
-	printf("Input encrypted file name: ");
-	scanf("%s", encrypt_name);
-	fencrypt(file_name, encrypt_name);
+	printf("Enter encryptfile name: ");
+	scanf("%s", encrypt_file);
+	printf("Enter decryptfile name: ");
+	scanf("%s", decrypt_file);
 	fread(file_name);
-	fread(encrypt_name);
+	fencrypt(file_name, encrypt_file);
+	fread(encrypt_file);
+	fdecrypt(encrypt_file, decrypt_file);
+	fread(decrypt_file);
 	printf("\n\nPress any key to exit. . .");
 	_getch();
 }
@@ -61,9 +67,10 @@ void fread(char*file_name)
 		readinput = fgetc(fp);
 	}
 	fclose(fp);
-	printf("\nNumber of lines in file: %d\n", nLines+1);
+	if (nChars > 0) nWords += 1;
+	printf("\n\nNumber of lines in file: %d\n", nLines+1);
 	printf("Number of characters in file: %d\n", nChars); // counts all characters except \n and space
-	printf("Number of words in file: %d\n", nWords);
+	printf("Number of words in file: %d\n\n", nWords);
 }
 
 void fwrite(char*file_name)
@@ -278,7 +285,6 @@ int fencrypt(char*file_name, char *encryptfile_name)
 	char readinput = fgetc(fp);
 	while (readinput != EOF)
 	{
-		printf("Shifting by %d\n", decrypt_code[counter]);
 		fputc(readinput + decrypt_code[counter], efp);
 		readinput = fgetc(fp);
 		counter++;
@@ -290,10 +296,48 @@ int fencrypt(char*file_name, char *encryptfile_name)
 	return 0;
 }
 
+
 int fdecrypt(char*decrypt_file, char* outfile)
 {
 	int decrypt_code[4];
-	int codein[8];
-	printf("Input decryption code (example: '11023398') : ");
+	char codein[9];
+	getchar(); // Flush stdin
+	printf("\n\nInput decryption code (example: '11023398') : ");
+	fgets(codein, sizeof codein, stdin);
+	if (strlen(codein) > 8) 
+	{
+		printf("Error! Only accept 8 digit input!!\n");
+		return -1;
+	}
+	int counter = 0;
+	for (int i = 0; i < 8; i++) // Parse numbers from string and put into decrypt_code array.
+	{
+		if (i % 2 == 0) // Check if number from string is odd or even, this will determine if it should be multiplied by 10 due to its position.
+		{
+			decrypt_code[counter] = ((int)codein[i] - 48) * 10; // Converts numbers from ASCII to integer.
+		}
+		else
+		{
+			decrypt_code[counter] += ((int)codein[i] - 48); // Converts numbers from ASCII to integer.
+			counter++;
+		}
+	}
+
+	FILE *finp, *foutp;
+	finp = fopen(decrypt_file,"r");
+	foutp = fopen(outfile, "w");
+	char readinput = fgetc(finp);
+	int code_counter = 0;
+	while (readinput != EOF)
+	{
+		fputc(readinput - decrypt_code[code_counter], foutp);
+		readinput = fgetc(finp);
+		code_counter++;
+		code_counter = code_counter % 4;
+	}
+	fclose(finp);
+	fclose(foutp);
+	printf("Successfully decrypted file!\n");
+	return 0;
 }
 
