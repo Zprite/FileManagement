@@ -33,16 +33,18 @@ void help()
 {
 	printf("\n\n- 'open'    - Input name of an already existing file. Opened file is passed to the other functions.\n"
 		"              IMPORTANT: Extension is needed! (example: test.txt)\n\n");
-	printf("- 'make'    - Creates a new file with selected name. File is automatically opened.\n"
+	printf("- 'make'    - Input file name. Creates a new file with selected name. File is automatically opened after make.\n"	
 		"              IMPORTANT: Extension is needed! (example: newfile.txt)\n\n");
 	printf("- 'read'    - Print the contents of opened file.\n\n");
-	printf("- 'write'   - Overwrite file with user input.\n\n");
-	printf("- 'delete'  - Delete line in opened file at select line.\n\n");
-	printf("- 'insert'  - Insert user input at select line. \n\n");
-	printf("- 'replace' - Replace line with user input at select line.\n\n");
-	printf("- 'merge'   - Merges the contents of opened file and select file, to select output file.\n\n");
-	printf("- 'encrypt' - Encrypts opened file with outputed key. Use key in 'decrypt' to decrypt.\n\n");
-	printf("- 'decrypt' - Decrypts opened file with select key. Outputs decrypted file to select file.\n\n");
+	printf("- 'write'   - Overwrite opened file with user input.\n\n");
+	printf("- 'delete'  - Delete content in opened file at select line.\n\n");
+	printf("- 'insert'  - Insert user input to opened file at select line. \n\n");
+	printf("- 'replace' - Replace content in opened file with user input at select line.\n\n");
+	printf("- 'merge'   - Merges the contents of opened file and select file, to select output-file.\n\n");
+	printf("- 'encrypt' - Encrypts opened file with randomly generated key, saves encrypted copy to select outfile.\n"
+		   "              IMPORTANT: Extension is needed! (example: encrypted.txt)\n\n");
+	printf("- 'decrypt' - Input decryption key. Decrypts opened file with select key. Outputs decrypted input to select outfile.\n"
+		   "              IMPORTANT: Extension is needed! (example: decrypted.txt)\n\n");
 	printf("- 'exit'    - Exit program.\n\n");
 	printf("-----------------------------------------------------------------------------------------------\n\n");
 }
