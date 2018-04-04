@@ -31,7 +31,7 @@ int main()
 }
 void help()
 {
-	printf("- 'open'    - Input name of an already existing file. Opened file is passed to the other functions.\n"
+	printf("\n\n- 'open'    - Input name of an already existing file. Opened file is passed to the other functions.\n"
 		"              IMPORTANT: Extension is needed! (example: test.txt)\n\n");
 	printf("- 'make'    - Creates a new file with selected name. File is automatically opened.\n"
 		"              IMPORTANT: Extension is needed! (example: newfile.txt)\n\n");
@@ -43,6 +43,7 @@ void help()
 	printf("- 'merge'   - Merges the contents of opened file and select file, to select output file.\n\n");
 	printf("- 'encrypt' - Encrypts opened file with outputed key. Use key in 'decrypt' to decrypt.\n\n");
 	printf("- 'decrypt' - Decrypts opened file with select key. Outputs decrypted file to select file.\n\n");
+	printf("- 'exit'    - Exit program.\n\n");
 	printf("-----------------------------------------------------------------------------------------------\n\n");
 }
 void sel()
@@ -95,7 +96,6 @@ void sel()
 			getchar(); // Flush stdin
 			if (proceed == 'y') 
 			{
-				printf("Writing");
 				fwrite(filename);
 				printf("\nWrite successfull!\n\n");
 			}
@@ -105,23 +105,26 @@ void sel()
 			int delete_line;
 			printf("Select line to delete: ");
 			scanf("%d", &delete_line);
-			fdel(filename, delete_line);
-			printf("Sucessfully deleted line %d in %s!\n\n", delete_line, filename);
+			if (!fdel(filename, delete_line)) {
+				printf("Sucessfully deleted line %d in %s!\n\n", delete_line, filename);
+			} else printf(" Failed to delete line %d in %s!\n\n", delete_line, filename);
 			getchar(); // FLush STDIN
 		}
 		else if (!strcmp(keyword,"insert")) {
 			int insert_line;
 			printf("Select line to insert to: ");
 			scanf("%d", &insert_line);
-			finsert(filename, insert_line);
-			printf("Sucessfully inserted lineto  %d in %s!\n\n", insert_line, filename);
+			if(!finsert(filename, insert_line))
+			printf("Sucessfully inserted to line %d in %s!\n\n", insert_line, filename);
+			else printf("Failed to insert to line %d in %s!\n\n", insert_line, filename);
 		}
 		else if (!strcmp(keyword,"replace")) {
 			int replace_line;
 			printf("select line to replace: ");
 			scanf("%d", &replace_line);
-			freplace(filename, replace_line);
+			if(!freplace(filename, replace_line))
 			printf("Sucessfully replaced line %d in %s!\n\n", replace_line, filename);
+			else("Failed to replace line %d in %s!\n\n", replace_line, filename);
 		}
 		else if (!strcmp(keyword,"merge")) {
 			char filename2[20];
@@ -131,7 +134,10 @@ void sel()
 			printf("Enter name for output file: ");
 			scanf("%s", newfile);
 			getchar(); //Flush stdin to remove trailing newline.
-			fmerge(filename, filename2, newfile);
+			if (!fmerge(filename, filename2, newfile))
+				printf("Files successfully merged.\n");
+			else
+				printf("Failed to merge files!\n");
 		}
 		else if (!strcmp(keyword,"encrypt"))
 		{
@@ -150,10 +156,14 @@ void sel()
 		}
 		else if (!strcmp(keyword,"help")) {
 			help();
+		} 
+		else if (!strcmp(keyword, "exit")) {
+			printf("\n Exiting...");
+			break;
 		}
 		else printf("'%s' is not a valid command! Type 'help' for a list of commands.\n\n", keyword);
 
-	} while (strcmp(keyword,"exit")!=0);
+	} while (1);
 }
 
 void fread(char*file_name)
@@ -370,7 +380,6 @@ int fmerge(char*file_name, char* file2_name, char* mergefile_name)
 	}
 	fclose(fp2);
 	fclose(fmp);
-	printf("Files successfully merged.\n");
 	return 0;
 }
 
