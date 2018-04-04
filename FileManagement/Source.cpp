@@ -7,7 +7,11 @@
 #include <conio.h>
 #include <Windows.h>
 #include <time.h>
+#include <string.h>
 
+
+void sel();
+void help();
 void fread(char*file_name);
 void fwrite(char*file_name);
 int fcopy(char*file_name, char* copy_name);
@@ -20,22 +24,136 @@ int fdecrypt(char*decrypt_file, char* outfile);
 
 int main()
 {
-	char file_name[20];
-	char encrypt_file[20];
-	char decrypt_file[20];
-	printf("Enter file name: ");
-	scanf("%s", file_name);
-	printf("Enter encryptfile name: ");
-	scanf("%s", encrypt_file);
-	printf("Enter decryptfile name: ");
-	scanf("%s", decrypt_file);
-	fread(file_name);
-	fencrypt(file_name, encrypt_file);
-	fread(encrypt_file);
-	fdecrypt(encrypt_file, decrypt_file);
-	fread(decrypt_file);
+	printf("----Welcome to file manager!----\n Write 'help' for a list of available commands!\n\n");
+	sel();
 	printf("\n\nPress any key to exit. . .");
 	_getch();
+}
+void help()
+{
+	printf("- 'open'    - Input name of an already existing file. Opened file is passed to the other functions.\n"
+		"              IMPORTANT: Extension is needed! (example: test.txt)\n\n");
+	printf("- 'make'    - Creates a new file with selected name. File is automatically opened.\n"
+		"              IMPORTANT: Extension is needed! (example: newfile.txt)\n\n");
+	printf("- 'read'    - Print the contents of opened file.\n\n");
+	printf("- 'write'   - Overwrite file with user input.\n\n");
+	printf("- 'delete'  - Delete line in opened file at select line.\n\n");
+	printf("- 'insert'  - Insert user input at select line. \n\n");
+	printf("- 'replace' - Replace line with user input at select line.\n\n");
+	printf("- 'merge'   - Merges the contents of opened file and select file, to select output file.\n\n");
+	printf("- 'encrypt' - Encrypts opened file with outputed key. Use key in 'decrypt' to decrypt.\n\n");
+	printf("- 'decrypt' - Decrypts opened file with select key. Outputs decrypted file to select file.\n\n");
+	printf("-----------------------------------------------------------------------------------------------\n\n");
+}
+void sel()
+{
+	char keyword[10];
+	do {
+		char filename[20];
+		fgets(keyword, sizeof keyword, stdin);
+		char *pos;
+		if ((pos = strchr(keyword, '\n')) != NULL)
+			*pos = '\0';
+
+		if (!strcmp(keyword, "open")) {
+			FILE * fp;
+			printf("Enter file name: ");
+			fgets(filename, sizeof filename, stdin);
+			char *pos;
+			if ((pos = strchr(filename, '\n')) != NULL)
+				*pos = '\0';
+			fp = fopen(filename, "r");
+			if (fp == NULL) { printf("Error! File cannot be opened or does not exist\n"); }
+			else
+			{
+				printf("%s is loaded!\n\n", filename);
+				fclose(fp);
+			}
+		}
+		else if (!strcmp(keyword,"make"))
+		{
+			FILE * fp;
+			printf("Create new file with name: ");
+			scanf("%s", filename);
+			getchar(); // Flush stdin to remover trailing newline.
+			fp = fopen(filename, "w");
+			if (fp == NULL) { printf("Error! File cannot be created\n"); }
+			else 
+			{
+				printf("Successfully created '%s'!\n\n", filename);
+				fclose(fp);
+			}
+		}
+		else if (!strcmp(keyword,"read"))
+		{
+			fread(filename);
+		}
+		else if (!strcmp(keyword,"write")) {
+			char proceed = 'n';
+			printf("WARNING: This will overwrite content of file, do you wish to proceed? (y/n)");
+			scanf("%c", &proceed);
+			getchar(); // Flush stdin
+			if (proceed == 'y') 
+			{
+				printf("Writing");
+				fwrite(filename);
+				printf("\nWrite successfull!\n\n");
+			}
+			else printf("Exiting write function...\n\n");
+		}
+		else if (!strcmp(keyword,"delete")) {
+			int delete_line;
+			printf("Select line to delete: ");
+			scanf("%d", &delete_line);
+			fdel(filename, delete_line);
+			printf("Sucessfully deleted line %d in %s!\n\n", delete_line, filename);
+			getchar(); // FLush STDIN
+		}
+		else if (!strcmp(keyword,"insert")) {
+			int insert_line;
+			printf("Select line to insert to: ");
+			scanf("%d", &insert_line);
+			finsert(filename, insert_line);
+			printf("Sucessfully inserted lineto  %d in %s!\n\n", insert_line, filename);
+		}
+		else if (!strcmp(keyword,"replace")) {
+			int replace_line;
+			printf("select line to replace: ");
+			scanf("%d", &replace_line);
+			freplace(filename, replace_line);
+			printf("Sucessfully replaced line %d in %s!\n\n", replace_line, filename);
+		}
+		else if (!strcmp(keyword,"merge")) {
+			char filename2[20];
+			char newfile[20];
+			printf("Merge with file: ");
+			scanf("%s", filename2);
+			printf("Enter name for output file: ");
+			scanf("%s", newfile);
+			getchar(); //Flush stdin to remove trailing newline.
+			fmerge(filename, filename2, newfile);
+		}
+		else if (!strcmp(keyword,"encrypt"))
+		{
+			char encryptfile[20];
+			printf("Enter name for encrypted outfile: ");
+			scanf("%s", encryptfile);
+			getchar(); // Flush stdin to remover trailing newline.
+			fencrypt(filename, encryptfile);
+		}
+		else if (!strcmp(keyword,"decrypt")) {
+			char decryptfile[20];
+			printf("Enter name for outputted decryptfile: ");
+			scanf("%s", decryptfile);
+			fdecrypt(filename, decryptfile);
+			getchar();
+		}
+		else if (!strcmp(keyword,"help")) {
+			help();
+		}
+		else printf("'%s' is not a valid command! Type 'help' for a list of commands.\n\n", keyword);
+
+	} while (strcmp(keyword,"exit")!=0);
 }
 
 void fread(char*file_name)
@@ -172,7 +290,7 @@ int finsert(char* file_name, int replace_line)
 		else 
 		{
 			getchar(); // Getchar to flush the newline from scanf
-			printf("Input to line %d:", replace_line + 1);
+			printf("Input to line %d:", replace_line);
 			fgets(input_buffer, sizeof input_buffer, stdin);
 			fputs(input_buffer, fp2);
 			nLine++;
